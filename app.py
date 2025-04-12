@@ -1,13 +1,5 @@
 import streamlit as st
 import pandas as pd
-import os
-
-# Thư mục chứa ảnh logo và banner
-# logo_folder = "/content/logo"
-# banner_folder = "/content/banner"
-# images_folder =  "/content/images"
-# price_folder = "/content/price_data"
-# voting_folder = "/content/voting"
 
 st.set_page_config(
   page_title="Hệ thống dự đoán biến động giá các cổ phiếu nhóm ngành Ngân hàng trong thị trường chứng khoán Việt Nam",
@@ -406,21 +398,21 @@ def show_stock_details(stock_code, bank_url):
     col1, col2 = st.columns([1, 2])  # Chia tỷ lệ 1:2 giữa logo và thông tin
 
     with col1:
-      def get_image_base64(image_path):
-        import base64
-        with open(image_path, "rb") as img_file:
-          return base64.b64encode(img_file.read()).decode("utf-8")
-      # Hiển thị logo doanh nghiệp
-      logo_path = f"LOGO_{stock_code}.jpg"
-      logo_html = ""
-      if os.path.exists(logo_path):
+        def get_image_base64(image_path):
+            import base64
+            with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode("utf-8")
+        # Hiển thị logo doanh nghiệp
+        logo_path = f"LOGO_{stock_code}.jpg"
+        logo_html = ""
+      
         st.markdown(
-          f"""
-          <div style="border: 2px solid #000; padding: 5px; display: inline-block;">
+            f"""
+            <div style="border: 2px solid #000; padding: 5px; display: inline-block;">
             <img src="data:image/jpg;base64,{get_image_base64(logo_path)}" width="250">
-          </div>
-          """,
-          unsafe_allow_html=True,
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
     with col2:
       st.markdown(f"**Nhóm ngành:** {info[stock_code][0]}")
@@ -430,8 +422,7 @@ def show_stock_details(stock_code, bank_url):
 
     # Hiển thị banner giá trị cốt lõi từ Google Drive
     banner_path = f"{stock_code}_GTCL.png"
-    if os.path.exists(banner_path):
-        st.image(banner_path, use_container_width=True)
+    st.image(banner_path, use_container_width=True)
 
     if stock_code == "BID":
       in_detail_BID()
@@ -480,13 +471,10 @@ def show_stock_details(stock_code, bank_url):
 
     file_path = f"Price_{stock_code}.csv"
 
-    if os.path.exists(file_path):
-      df = load_data(file_path)
-      df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y', errors='coerce')
-      df_filtered = df[(df['Date'] >= pd.to_datetime(start_date_tab2)) & (df['Date'] <= pd.to_datetime(end_date_tab2))]
-      display_paginated_data(df_filtered)
-    else:
-      st.warning(f"Không tìm thấy file dữ liệu cho {stock_code}.")
+    df = load_data(file_path)
+    df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y', errors='coerce')
+    df_filtered = df[(df['Date'] >= pd.to_datetime(start_date_tab2)) & (df['Date'] <= pd.to_datetime(end_date_tab2))]
+    display_paginated_data(df_filtered)
 
 
   with tab3:
@@ -509,27 +497,26 @@ def show_stock_details(stock_code, bank_url):
 
     found_chart = False
     for chart_file in chart_files:
-      chart_path = chart_file
-      model_type = chart_file.split('_')[0]
+        chart_path = chart_file
+        model_type = chart_file.split('_')[0]
 
-      if os.path.exists(chart_path):
+      
         st.markdown(
         """
         <style>
             .stImage img {
-              display: block;
-              margin-left: auto;
-              margin-right: auto;
-              width: 80%;  /* Điều chỉnh chiều rộng ảnh nhỏ lại */
-              max-width: 800px;  /* Kích thước tối đa */
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                width: 80%;  /* Điều chỉnh chiều rộng ảnh nhỏ lại */
+                max-width: 800px;  /* Kích thước tối đa */
             }
         </style>
         """, unsafe_allow_html=True)
         st.image(chart_path)
         # st.markdown(captions.get(model_type, "Biểu đồ không xác định"), unsafe_allow_html=True)
         found_chart = True
-      else:
-          st.warning(f"Không tìm thấy biểu đồ: {chart_file}")
+
 
   with tab4:
     st.header(f"Tin tức tổng hợp {stock_code}")
@@ -573,13 +560,12 @@ def show_stock_details(stock_code, bank_url):
     file_path_xlsx = f"sentiment_voting_{stock_code}.xlsx"
     start_date_tab4 = st.date_input("Chọn ngày bắt đầu", min_value=pd.to_datetime("2020-01-01"), key= "start_date_tab4")
     end_date_tab4 = st.date_input("Chọn ngày kết thúc", min_value=start_date_tab4, key= "end_date_tab4")
-    if os.path.exists(file_path_xlsx):
-      df = load_data_from_excel(file_path_xlsx)
-      df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y', errors='coerce')
-      df_filtered = df[(df['Date'] >= pd.to_datetime(start_date_tab4)) & (df['Date'] <= pd.to_datetime(end_date_tab4))]
-      display_news_cards(df_filtered)
-    else:
-        st.warning(f"Không tìm thấy file dữ liệu cho {stock_code}.")
+
+    df = load_data_from_excel(file_path_xlsx)
+    df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y', errors='coerce')
+    df_filtered = df[(df['Date'] >= pd.to_datetime(start_date_tab4)) & (df['Date'] <= pd.to_datetime(end_date_tab4))]
+    display_news_cards(df_filtered)
+
 
 # Cập nhật mã cổ phiếu và URL tương ứng
 def show_BID():
