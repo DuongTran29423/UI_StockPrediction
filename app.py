@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import os
 
 st.set_page_config(
   page_title="Hệ thống dự đoán biến động giá các cổ phiếu nhóm ngành Ngân hàng trong thị trường chứng khoán Việt Nam",
@@ -401,7 +402,7 @@ def show_stock_details(stock_code, bank_url):
         def get_image_base64(image_path):
             import base64
             with open(image_path, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode("utf-8")
+                return base64.b64encode(img_file.read()).decode("utf-8")
         # Hiển thị logo doanh nghiệp
         logo_path = f"LOGO_{stock_code}.jpg"
         logo_html = ""
@@ -409,7 +410,7 @@ def show_stock_details(stock_code, bank_url):
         st.markdown(
             f"""
             <div style="border: 2px solid #000; padding: 5px; display: inline-block;">
-            <img src="data:image/jpg;base64,{get_image_base64(logo_path)}" width="250">
+                <img src="data:image/jpg;base64,{get_image_base64(logo_path)}" width="250">
             </div>
             """,
             unsafe_allow_html=True,
@@ -422,7 +423,8 @@ def show_stock_details(stock_code, bank_url):
 
     # Hiển thị banner giá trị cốt lõi từ Google Drive
     banner_path = f"{stock_code}_GTCL.png"
-    st.image(banner_path, use_container_width=True)
+    if os.path.exists(banner_path):
+        st.image(banner_path, use_container_width=True)
 
     if stock_code == "BID":
       in_detail_BID()
@@ -471,10 +473,12 @@ def show_stock_details(stock_code, bank_url):
 
     file_path = f"Price_{stock_code}.csv"
 
+
     df = load_data(file_path)
     df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y', errors='coerce')
     df_filtered = df[(df['Date'] >= pd.to_datetime(start_date_tab2)) & (df['Date'] <= pd.to_datetime(end_date_tab2))]
     display_paginated_data(df_filtered)
+
 
 
   with tab3:
@@ -500,16 +504,16 @@ def show_stock_details(stock_code, bank_url):
         chart_path = chart_file
         model_type = chart_file.split('_')[0]
 
-      
+   
         st.markdown(
         """
         <style>
             .stImage img {
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
-                width: 80%;  /* Điều chỉnh chiều rộng ảnh nhỏ lại */
-                max-width: 800px;  /* Kích thước tối đa */
+              display: block;
+              margin-left: auto;
+              margin-right: auto;
+              width: 80%;  /* Điều chỉnh chiều rộng ảnh nhỏ lại */
+              max-width: 800px;  /* Kích thước tối đa */
             }
         </style>
         """, unsafe_allow_html=True)
@@ -560,12 +564,11 @@ def show_stock_details(stock_code, bank_url):
     file_path_xlsx = f"sentiment_voting_{stock_code}.xlsx"
     start_date_tab4 = st.date_input("Chọn ngày bắt đầu", min_value=pd.to_datetime("2020-01-01"), key= "start_date_tab4")
     end_date_tab4 = st.date_input("Chọn ngày kết thúc", min_value=start_date_tab4, key= "end_date_tab4")
-
+    
     df = load_data_from_excel(file_path_xlsx)
     df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y', errors='coerce')
     df_filtered = df[(df['Date'] >= pd.to_datetime(start_date_tab4)) & (df['Date'] <= pd.to_datetime(end_date_tab4))]
     display_news_cards(df_filtered)
-
 
 # Cập nhật mã cổ phiếu và URL tương ứng
 def show_BID():
